@@ -1,13 +1,7 @@
 import pandas as pd
 import numpy as np
-import subprocess
-import sys
+import scipy.stats as stats
 
-try:
-    import scipy.stats as stats
-except ModuleNotFoundError:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "scipy"])
-    import scipy.stats as stats
 
 # 📌 Definir los períodos de retorno
 Tr = np.array([2, 5, 10, 25, 50, 100, 200, 500, 1000, 2000])
