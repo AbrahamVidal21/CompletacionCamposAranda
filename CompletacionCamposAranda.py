@@ -1,44 +1,41 @@
 import pandas as pd
 import numpy as np
 
-# Cargar los datos
-ruta = r"C:\Users\User\Desktop\Analisis de Socavacion\Miraflores\Python\CompletacionLluviaCamposArnada\datos.csv"
-
-# Intenta leer con encoding='latin1'
+# 📌 Cargar los datos desde el CSV
+ruta = "datos.csv"
 try:
     df = pd.read_csv(ruta, encoding='latin1')
 except UnicodeDecodeError:
     df = pd.read_csv(ruta, encoding='ISO-8859-1')
 
-print(df.head())  # Muestra las primeras filas para verificar la lectura correcta
-
-# Convertir "ND" a NaN para manejar datos faltantes
+# 📌 Convertir valores 'ND' a NaN y asegurar tipo numérico
 df.replace("ND", np.nan, inplace=True)
-df = df.astype(float)  # Asegurar que los datos sean numéricos
+df = df.astype(float)
 
-# Iterar sobre cada estación con datos faltantes
-for estacion in df.columns:
-    if df[estacion].isna().sum() > 0:  # Si hay datos faltantes
-        print(f"Procesando estación: {estacion}")
-        
-        # Seleccionar estaciones de referencia (las que tienen datos completos)
-        estaciones_ref = df.dropna(axis=1, how='any')  # Columnas sin NaN
-        if estaciones_ref.empty:
-            print(f"No hay estaciones de referencia para {estacion}")
-            continue
-        
-        # Calcular coeficientes de ajuste
-        suma_PR_PM = estaciones_ref.mul(df[estacion], axis=0).sum()
-        suma_PR2 = estaciones_ref.pow(2).sum()
-        coeficientes = suma_PR_PM / suma_PR2
-        
-        # Estimar los valores faltantes
-        for i, valor in df[estacion].items():
-            if pd.isna(valor):
-                PR = estaciones_ref.loc[i].dropna()
-                if not PR.empty:
-                    df.at[i, estacion] = (coeficientes[PR.index] * PR).sum() / coeficientes[PR.index].sum()
+# 📌 Aplicar el método de Campos-Aranda para la completación
+def campos_aranda(df):
+    for estacion in df.columns:
+        if df[estacion].isna().sum() > 0:
+            print(f"Procesando estación: {estacion} con método Campos-Aranda")
+            estaciones_ref = df.drop(columns=[estacion]).dropna(axis=1, how='any')
+            if estaciones_ref.empty:
+                print(f"No hay estaciones de referencia para {estacion}")
+                continue
+            
+            # Calcular promedios de cada estación
+            promedio_estacion = df[estacion].mean(skipna=True)
+            promedio_ref = estaciones_ref.mean()
 
-# Guardar los datos completados
-df.to_csv("datos_completados.csv", index=False)
-print("Proceso completado. Datos guardados en 'datos_completados.csv'")
+            for i, valor in df[estacion].items():
+                if pd.isna(valor):
+                    PR = estaciones_ref.loc[i].dropna()
+                    if not PR.empty:
+                        # Método Campos-Aranda: ajuste proporcional
+                        df.at[i, estacion] = promedio_estacion * (PR / promedio_ref[PR.index]).mean()
+
+    return df
+
+# 📌 Ejecutar método y guardar resultados
+df = campos_aranda(df)
+df.to_csv("datos_completados_campos_aranda.csv", index=False)
+print("Proceso completado con el método de Campos-Aranda. Resultados guardados en 'datos_completados_campos_aranda.csv'")

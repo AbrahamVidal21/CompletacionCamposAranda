@@ -1,64 +1,47 @@
-README - Método de Campos Aranda para Completación de Datos de Lluvia
+# Método de Campos Aranda para Completación de Series Hidrometeorológicas
 
-Descripción
+## 📌 Descripción
+El **Método de Campos Aranda** es una técnica avanzada para la completación de datos faltantes en series hidrometeorológicas, especialmente en registros de precipitaciones. Este método mejora la precisión al utilizar mínimos cuadrados ponderados y considerar la relación entre estaciones auxiliares y la estación en estudio.
 
-Este programa en Python implementa el método de Campos Aranda para la completación de datos de lluvia en estaciones climatológicas con registros faltantes. Utiliza la correlación entre estaciones cercanas y la normalización de datos para estimar valores faltantes de manera precisa.
+### ✅ **Ventajas del Método:**
+- **Alta precisión:** Ajuste basado en correlaciones entre estaciones.
+- **Eficiente para diferencias grandes:** Útil cuando las precipitaciones medias difieren en más del 10%.
+- **Ampliamente utilizado:** Recomendado en manuales técnicos como CONAGUA, IMTA y MAPAS.
 
-Fundamento Teórico
+---
+## 📝 Descripción del Código en Python
+El script realiza la completación de precipitaciones faltantes mediante el método de Campos Aranda. A continuación se explican las secciones principales:
 
-El método de Campos Aranda se basa en la relación entre la precipitación media anual de estaciones cercanas para estimar datos faltantes. La ecuación fundamental utilizada es:
+### **1️⃣ Carga de Datos:**
+- Carga el archivo CSV.
+- Convierte valores no definidos ('ND') en `NaN`.
+- Asegura que todos los datos sean numéricos.
 
-                    Px = (Nx / Nr) * Pr
-Donde:
+### **2️⃣ Selección de Estaciones Auxiliares:**
+- Identifica estaciones con datos completos para usarlas como referencia.
 
-P_x: Precipitación estimada en la estación con datos faltantes.
+### **3️⃣ Cálculo de Coeficientes (Mínimos Cuadrados):**
+- Aplica el método de **Campos Aranda**:  
+  \[ Px = \frac{\sum (PR \times PM)}{\sum PM^2} \]
+  Donde:
+  - **Px:** Precipitación faltante.
+  - **PR:** Precipitación registrada en estaciones auxiliares.
+  - **PM:** Precipitación media anual.
 
-N_x: Precipitación media anual en la estación con datos faltantes.
+### **4️⃣ Completación de Datos:**
+- Rellena los valores faltantes mediante la ecuación anterior.
 
-N_r: Precipitación media anual en la estación de referencia.
+### **5️⃣ Exportación de Resultados:**
+- Guarda el archivo `datos_completados.csv` con los valores completados.
 
-P_r: Precipitación registrada en la estación de referencia en el periodo correspondiente.
+---
+## 🛠️ **Ejecución del Script:**
+1. Instala dependencias: `pip install pandas numpy`
+2. Coloca tu archivo `datos.csv` en la carpeta del script.
+3. Ejecuta: `python completacion_campos_aranda.py`
+4. Verifica el archivo `datos_completados.csv`.
 
-Pasos de Implementación
-
-Lectura de datos: El programa lee los datos de lluvia de diferentes estaciones desde archivos CSV.
-
-Ordenamiento de datos: Se organizan los datos de mayor a menor para cada estación.
-
-Selección de estaciones cercanas: Se identifican estaciones con registros completos y características climatológicas similares.
-
-Cálculo de la media anual de precipitación para cada estación.
-
-Aplicación del método de normalización para estimar los valores faltantes.
-
-Validación de resultados mediante análisis estadísticos y revisión de la consistencia de la serie temporal.
-
-Requisitos del Proyecto
-
-Python 3.x
-
-Pandas
-
-NumPy
-
-Para instalar las dependencias, ejecutar:
-
-pip install pandas numpy
-
-Ejemplo de Uso
-
-Para ejecutar el programa, usar el siguiente comando en la terminal:
-
-python camposAranda.py
-
-El programa procesará automáticamente todas las estaciones y generará una salida con los datos completados.
-
-Referencias
-
-Campos-Aranda, D. F. (1998). Hidrología Superficial. Universidad Autónoma de San Luis Potosí.
-
-Chow, V. T., Maidment, D. R., & Mays, L. W. (1988). Applied Hydrology. McGraw-Hill.
-
-Comisión Nacional del Agua (CONAGUA). (2015). Manual de procedimientos hidrometeorológicos. CONAGUA.
-
-Este software está diseñado para apoyar estudios hidrológicos y facilitar la reconstrucción de series de datos de lluvia en estaciones meteorológicas.
+---
+## 📚 **Referencias:**
+- Campos-Aranda, D. F. (2002). *Completación de series hidrometeorológicas*. IMTA.
+- CONAGUA. (2014). *Manual de Prácticas Hidrológicas* (MAPAS #19).
